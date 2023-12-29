@@ -1,12 +1,12 @@
 import {Router} from "express"
-import {CartManagerFile} from "../managers/CartManagerFile.js"
+import {CartManagerDB} from "../dao/dbManagers/CartManagerDB.js"
 
 const path = "carts.json"
 const router = Router() 
-const cartManagerFile = new CartManagerFile(path)
+const cartManagerDB = new CartManagerDB(path)
 
 router.get("/", async(req,res)=>{
-    const carts = await cartManagerFile.getCarts()
+    const carts = await cartManagerDB.getCarts()
     res.send({
         status:"succes",
         carts: carts
@@ -30,10 +30,11 @@ router.get("/:cid", async (req, res) => {
 });
 
 router.post("/", async(req,res)=>{
-    const cart = req.body
-    const products = req.body.products
-    const carts = await cartManagerFile.crearCarts(cart,products)
-    
+    // const cart = req.body
+    // const products = req.body.products
+    // const carts = await cartManagerFile.crearCarts(cart,products)
+    const cart = await cartManagerDB.createCart()
+
         
     res.send({
         status:"succes",
@@ -44,10 +45,11 @@ router.post("/", async(req,res)=>{
 router.post("/:cid/products /:pid", async(req,res)=>{
     const cid = req.params.cid
     const pid = req.params.pid
-
+    const stock = req.body.stock
+    const cart = await cartManagerDB.addProductsInCart(pid,cid,stock)
     res.send({
         status:"succes",
-        msg: `RUTA POST CART - agrego producto al carrito. CID ${cid} - PID ${pid}`
+        msg: cart
     })
 })
 

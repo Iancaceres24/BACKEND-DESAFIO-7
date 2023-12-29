@@ -1,16 +1,35 @@
 import {Router} from "express"
-import {ProductManagerFile} from "../managers/ProductManagersFile.js"
+import ProductManagerDB from "../dao/dbManagers/ProductManagerDB.js"
 
-const path = "products.json"
 const router = Router() 
-const productManagerFile = new ProductManagerFile(path)
+const productManagerDB = new ProductManagerDB()
 
 router.get("/", async(req,res)=>{
-    const productos = await productManagerFile.getProducts()
-    res.send({
-        status:"succes",
-        productos: productos    
-    })
+
+    try {
+        const{limit,page,sort,category,price} = req.query
+        const options =  {
+            limit: limit ?? 10,
+            page: page ?? 1,
+            sort: {price: sort == "asc"? 1: -1},
+            lean: true   
+        }
+        const productos = await productManagerDB.getProducts(options)
+
+        if(productos.hasPrevPage){
+            productos.prevLink = "---LINK---"}
+        if(productos.hasNextPage){
+                productos.nextLink = "---LINK---"
+            }
+        res.send({
+            status:"succes",
+            productos: productos    
+        })
+        
+    } catch (error) {
+        console.log(error)
+    }   
+
 })
 
 router.get("/:pid", async (req, res) => {

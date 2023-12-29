@@ -27,7 +27,7 @@ const productSchema = new mongoose.Schema({
         type: String,
         require: true
     },
-    status: true,
+    status: Boolean,
 
     thumbnails:{
         type: Array,
