@@ -1,9 +1,14 @@
 import {Router} from "express"
-import ProductManagerDB from "../dao/dbManagers/ProductManagerDB"
-const router = Router()
+import ProductManagerDB from "../dao/dbManagers/ProductManagerDB.js"
+import productModel from "../dao/models/products.models.js"
 
-router.get("/products",(req,res)=>{
-    res.render("products")
+const router = Router()
+const productManagerDB = new ProductManagerDB()
+
+
+    router.get("/products", async(req,res)=>{
+    const products = await productModel.find().lean()
+    res.render("products",{products})
 })
 
 router.get("/carts",async(req,res)=>{

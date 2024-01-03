@@ -14,7 +14,7 @@ const PORT = 8080
 const app = express()
 
 app.use(express.json())
-app.use(urlencoded({extended:true}))
+app.use(express.urlencoded({extended:true}))
 app.use(express.static(`${__dirname}/public`))
 
 app.listen(PORT,()=>{

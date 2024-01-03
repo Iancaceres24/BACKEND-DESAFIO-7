@@ -33,7 +33,7 @@ router.get("/", async(req,res)=>{
 })
 
 router.get("/:pid", async (req, res) => {
-    const productos = await productManagerFile.getProducts()
+    const productos = await productManagerDB.getProducts()
     const pid = req.params.pid;
     const produ = productos.find(pro =>{return pro.id == pid})
 
@@ -49,20 +49,24 @@ router.get("/:pid", async (req, res) => {
 });
 
 router.post("/", async(req,res)=>{
-    const producto = req.body
-    const productos = await productManagerFile.crearProducto(producto)
-    if(!producto.title||!producto.description||!producto.code||!producto.price||!producto.stock||!producto.category){
+    const {title,description,code,price,stock,category} = req.body
+    
+    if(!title||!description||!code||!price||!stock||!category){
         res.send({
             status:"error",
             msg: "Faltan campos"
         })
-    }else{
+    }
+    const product = {
+        title, description,code,price,stock,category
+    }
+    const producto = await productManagerDB.createProduct(product)
     res.send({
         status:"succes",
         msg: "Producto creado",
         productos: producto
     })}
-})
+)
 
 router.put("/:pid", async(req,res)=>{
     const productos = await productManagerFile.getProducts()   
