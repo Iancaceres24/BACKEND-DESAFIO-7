@@ -9,12 +9,12 @@
         {{/each}}
     </ul>
     <div>
-        {{#if students.hasPrevPage}}
-        <a href="/students?page={{students.prevPage}}">Anterior</a>
+        {{#if options.hasPrevPage}}
+        <a href="/students?page={{options.prevPage}}">Anterior</a>
         {{/if}}
-        <span>Pagina {{students.page}} de {{students.totalPages}}</span>
-        {{#if students.hasNextPages}}
-            <a href="/students?page={{students.nextPage}}">Siguiente</a>
+        <span>Pagina {{students.page}} de {{options.totalPages}}</span>
+        {{#if options.hasNextPages}}
+            <a href="/students?page={{options.nextPage}}">Siguiente</a>
         {{/if}}
     </div>
     

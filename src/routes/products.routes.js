@@ -33,20 +33,12 @@ router.get("/", async(req,res)=>{
 })
 
 router.get("/:pid", async (req, res) => {
-    const productos = await productManagerDB.getProducts()
-    const pid = req.params.pid;
-    const produ = productos.find(pro =>{return pro.id == pid})
+    const pid =  req.params.pid;
+    const producto  = await productManagerDB.getProductByID(pid) 
+    res.send(producto)
+})
 
-    if (!produ) {
-        return res.json({
-            error: "Producto no encontrado"
-        });
-    } else {
-        res.json({
-            producto: produ
-        });
-    }
-});
+    
 
 router.post("/", async(req,res)=>{
     const {title,description,code,price,stock,category} = req.body
@@ -69,49 +61,28 @@ router.post("/", async(req,res)=>{
 )
 
 router.put("/:pid", async(req,res)=>{
-    const productos = await productManagerFile.getProducts()   
     const pid = req.params.pid
-    
-    const { campo, nuevoValor } = req.body;
-    if(campo === "id"){
-        res.send({
-            status:"error",
-            msg: "No se puede modificar el id",
-    })}else{
-    const index = productos.findIndex(producto => producto.id == pid);
-    if (index === -1) {
-        return res.status(404).json({ error: "Producto no encontrado" });
+    const {title,description,code,price,stock,category} = req.body
+    const update = {
+        title,description,code,price,stock,category
     }
-    productos[index][campo] = nuevoValor;
-
-    await productManagerFile.updateProduct(pid, { [campo]: nuevoValor });
+    const producto = productManagerDB.updateProduct(pid,update)
     res.send({
-        status:"succes",
-        msg: "Producto actualizado correctamente",
-        producto: productos[index]
-    })
-}})
+        status: "succes",
+        msg: "Producto actualizado",
+        producto: producto
+    })    
+})
 
 router.delete("/:pid", async (req, res) => {
-    
-        const productos = await productManagerFile.getProducts();
-        const pid = req.params.pid;
-        
-        const index = productos.findIndex(producto => producto.id == pid);
-
-        if (index === -1) {
-            return res.status(404).json({ error: "Producto no encontrado" });
-        }
-        const productoEliminado = productos.splice(index, 1)[0];
-
-        await productManagerFile.updateProductList(productos);
+        const pid = req.params.pid
+        const producto = productManagerDB.deleteProduct(pid)
 
         res.send({
-            status: "Correcto",
+            status: "success",
             eliminada: `Producto eliminado`,
-            producto: productoEliminado,
-            productos: productos
-        });
+            }
+        );
     
 })
 

@@ -16,13 +16,22 @@ class ProductManagerDB {
             return products 
     }
 
-    getProductByID = async (pid) =>{
-        const product = await productModel.findOne({_pid:pid})
-        return {
-            status: "succes",
-            msg: product
-        }
-    }
+    getProductByID = async (pid) => {
+            const product = await productModel.findOne({ _id: pid });
+    
+            if (!product) {
+                return {
+                    status: "error",
+                    msg: "Producto no encontrado"
+                };
+            }
+    
+            return {
+                status: "success",
+                msg: product
+            };
+        
+    };
     createProduct = async (product) =>{
         
         const producto = await productModel.create(product)
@@ -32,7 +41,17 @@ class ProductManagerDB {
         }
     }
 
+    deleteProduct = async(pid) =>{
+        const producto = await productModel.deleteOne({_id:pid})
+        return producto
+            
+        }
 
-}
+    updateProduct = async(pid,update)=>{
+        
+        const producto = await productModel.updateOne({_id:pid},{$set:update})
+        return producto
+    }
 
+    }
 export default ProductManagerDB
