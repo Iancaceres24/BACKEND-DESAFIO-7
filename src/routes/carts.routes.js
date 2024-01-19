@@ -14,7 +14,7 @@ router.get("/", async(req,res)=>{
 })
 
 router.get("/:cid", async (req, res) => {
-    const carts = await cartManagerFile.getCarts()
+    const carts = await cartManagerDB.getCartsByID()
     const cid = req.params.cid;
     const carri = carts.find(car =>{return car.id == cid})
 
