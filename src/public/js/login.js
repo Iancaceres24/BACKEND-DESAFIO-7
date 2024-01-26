@@ -28,20 +28,14 @@ form.addEventListener("submit", e =>{
 
         }
 
-    }).then(result=>{
-
-        if(result.status===200){
-
-            window.location.replace('/products')
-
-        }else{
-
-            console.log(result);
-
-        }
-
-    })
-
+     }).then(result => result.json())
+     .then(result => {
+         if (result.status === "success") {
+             window.location.replace('/products');
+         } else {
+             console.log(result);
+         }
+     });
  
 
 })

@@ -2,66 +2,76 @@ import { Router } from "express"
 import userModel from "../dao/models/user.models.js"
 import { createHash } from "../utils.js"
 import { validatePassword } from "../utils.js"
-
+import passport from "passport"
 const router = Router()
 
-router.post("/register", async(req,res)=>{
-    const {first_name,last_name,email,age,password} = req.body
-
-    const exists = await userModel.findOne({email,password})
-
-    if(exists){
-        return res.status(400).send({
-            status:"error",
-            error: "El usuario ya existe"
+router.post("/register",passport.authenticate("register",{failureRedirect:"/api/sessions/failregister"}),
+    async(req,res)=>{
+        res.send({
+            status: "success",
+            message: "Usuario registrado"
         })
+    })
+router.get("/failregister",async(req,res)=>{
+        console.log("Fallo el registro")
+        res.send({error: "Error en el registro"})
+    })
+
+
+// router.post ("/", async(req,res)=>{
+//     const {email,password} = req.body
+//     const user = await userModel.findOne({email})
+
+//     if(!user){
+//         return res.status(400).send({
+//             status: "error",
+//             error: "Datos incorrectos"
+//         })
+//     }
+//     const isValidPassword = validatePassword(password,user)
+//     if(!isValidPassword){
+//         return res.status(400).send({
+//             status: "error",
+//             error: "Datos incorrectos"
+//         })
+//     }
+
+
+//     req.session.user = {
+//         full_name: `${user.first_name} ${user.last_name}`,
+//         email: user.email,
+//         age: user.age
+//     }
+
+//     res.send({
+//         status: "Succes",
+//         payload: req.session.user,
+//         message: "Mi primer login!!"
+//     }
+//     )
+
+// })
+router.post("/",passport.authenticate("login",{failureRedirect:"/api/sessions/faillogin"}),async(req,res)=>{
+    if(!req.user){
+        return res.status(400).send({status: "error"})
     }
-    const user = {
-        first_name, last_name, email, age, password: createHash(password)
-    }
-
-    let result = await userModel.create(user)
-    res.send({
-        status: "success",
-        message: "Usuario registrado"
-    }
-    )
-
-})
-
-router.post ("/", async(req,res)=>{
-    const {email,password} = req.body
-    const user = await userModel.findOne({email})
-
-    if(!user){
-        return res.status(400).send({
-            status: "error",
-            error: "Datos incorrectos"
-        })
-    }
-    const isValidPassword = validatePassword(password,user)
-    if(!isValidPassword){
-        return res.status(400).send({
-            status: "error",
-            error: "Datos incorrectos"
-        })
-    }
-
-
     req.session.user = {
-        full_name: `${user.first_name} ${user.last_name}`,
-        email: user.email,
-        age: user.age
+        first_name: req.user.first_name,
+        last_name: req.user.last_name,
+        age: req.user.age,
+        email: req.user.email
     }
-
     res.send({
-        status: "Succes",
-        payload: req.session.user,
-        message: "Mi primer login!!"
-    }
-    )
-
+        status:"success",
+        payload: req.user
+    })
 })
+
+router.get("/faillogin",(req,res)=>{
+    res.send({error:"Fallo el login"})
+}
+)
+
 
 router.get("/logout", (req,res)=>{
     req.session.destroy(err=>{
@@ -74,6 +84,31 @@ router.get("/logout", (req,res)=>{
         res.redirect("/")
     })
 })
+
+
+router.post("/resetPassword",async(req,res)=>{
+    const {email,password} = req.body
+    if(!email || !password)  return res.status(400).send({
+        status:"error",
+        error: "Datos incorrectos"
+    })
+    const user = await userModel.findOne({email})
+    if(!user)   return res.status(400).send({
+            status:"error",
+            error: "No existe el usuario"
+        })
+    
+    const newHashPassword = createHash(password)
+    
+    await userModel.updateOne({_id : user._id},{$set:{password: newHashPassword}})
+    res.send({
+            status:"succes",
+            error: "Contraseña restaurada"
+        
+    })
+
+})
+
 
 
 

@@ -3,12 +3,14 @@ import mongoose from "mongoose"
 import {engine} from "express-handlebars"
 import  MongoStore from "connect-mongo"
 import session from "express-session"
+import passport from "passport"
 
 import __dirname from "./utils.js"
 import { cartRouter } from "./routes/carts.routes.js"
 import { productsRouter } from "./routes/products.routes.js"
 import {viewRouter} from "./routes/view.routes.js"
 import sessionRouter from "./routes/sessions.routes.js"
+import inicializePassport from "./config/passport.config.js"
 
 const MONGO = "mongodb+srv://iancaceres:familia123@backend.atwvpnx.mongodb.net/DESAFIO-7"
 const connection = mongoose.connect(MONGO)
@@ -45,3 +47,6 @@ app.use("/api/products",productsRouter)
 app.use("/api/carts",cartRouter)
 app.use("/",viewRouter)
 app.use("/api/sessions", sessionRouter)
+inicializePassport()
+app.use(passport.initialize())
+app.use(passport.session())

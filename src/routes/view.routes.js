@@ -23,4 +23,8 @@ router.get("/carts",async(req,res)=>{
     res.render("carts")
 })
 
+router.get("/resetPassword",(req,res)=>{
+    res.render("resetPassword")
+})
+
 export {router as viewRouter}
