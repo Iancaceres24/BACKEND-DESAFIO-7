@@ -1,6 +1,6 @@
 import passport from "passport"
 import local from "passport-local"
-
+import GitHubStrategy from "passport-github2"
 import userModel from "../dao/models/user.models.js"
 import {createHash, validatePassword} from "../utils.js"
 
@@ -54,6 +54,37 @@ const inicializePassport = () =>{
 
     })
 
+    passport.use("github", new GitHubStrategy({
+        clientID: "Iv1.cb9b13fc0d13d066",
+        clientSecret: "d3bb912287adc19def6bc41c12a7cb3ab636dad7",
+        callbackUrl: "http://localhost:8080/api/sessions/githubcallback",
+    }, async(accesToken, refreshToken, profile, done)=>{
+        try {
+            console.log(profile)
+            const first_name = profile._json.name
+            let email
+            if(profile._json.email){
+                
+                email = profile.username
+            }
+            let user = await userModel.findOne({email: profile._json.email})
+            if(user){
+                console.log("Usuario ya registrado")
+                return done(null,false)
+            }
+            const newUser = {
+                first_name, 
+                last_name:"",
+                email,
+                age:"null", 
+                password: ""}
+            const result = await userModel.create(newUser)
+            return done(null,result)
+
+        } catch (error) {
+            return done(error)
+        }
+    }))
 }
 
 export default inicializePassport

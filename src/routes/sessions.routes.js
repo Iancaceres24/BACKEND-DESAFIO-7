@@ -17,40 +17,13 @@ router.get("/failregister",async(req,res)=>{
         res.send({error: "Error en el registro"})
     })
 
+router.get("/github", passport.authenticate("github",{scope:["user:email"]}), async(req,res)=>{})
 
-// router.post ("/", async(req,res)=>{
-//     const {email,password} = req.body
-//     const user = await userModel.findOne({email})
+router.get("/githubcallback",passport.authenticate("github", {failureRedirect: "/"}),async(req,res)=>{
+    req.session.user = req.user
+    res.redirect("/")
+})
 
-//     if(!user){
-//         return res.status(400).send({
-//             status: "error",
-//             error: "Datos incorrectos"
-//         })
-//     }
-//     const isValidPassword = validatePassword(password,user)
-//     if(!isValidPassword){
-//         return res.status(400).send({
-//             status: "error",
-//             error: "Datos incorrectos"
-//         })
-//     }
-
-
-//     req.session.user = {
-//         full_name: `${user.first_name} ${user.last_name}`,
-//         email: user.email,
-//         age: user.age
-//     }
-
-//     res.send({
-//         status: "Succes",
-//         payload: req.session.user,
-//         message: "Mi primer login!!"
-//     }
-//     )
-
-// })
 router.post("/",passport.authenticate("login",{failureRedirect:"/api/sessions/faillogin"}),async(req,res)=>{
     if(!req.user){
         return res.status(400).send({status: "error"})
